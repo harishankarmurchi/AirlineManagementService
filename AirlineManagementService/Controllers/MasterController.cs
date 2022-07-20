@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models.ViewModels;
 using Services.Abstraction;
@@ -20,6 +21,7 @@ namespace AirlineManagementService.Controllers
         }
 
         [HttpGet("masterdata")]
+        [Authorize]
         public async Task<Response<MasterVM>> GetMasterData()
         {
             var response = new Response<MasterVM>();
@@ -39,6 +41,7 @@ namespace AirlineManagementService.Controllers
 
         [HttpGet]
         [Route("airline")]
+        [Authorize]
         public async Task<Response<object>> GetAllAirlines()
         {
             var response = new Response<object>();

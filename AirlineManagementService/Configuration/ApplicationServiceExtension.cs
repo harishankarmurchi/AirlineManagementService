@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Consul;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Repository;
@@ -21,25 +24,25 @@ namespace AirlineManagementService.Configuration
                 
             });
 
-            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            //        .AddJwtBearer(c =>
-            //        {
-            //            c.TokenValidationParameters = new TokenValidationParameters
-            //            {
-            //                ValidateIssuer = true,
-            //                ValidateAudience = true,
-            //                ValidateLifetime = true,
-            //                ValidateIssuerSigningKey = true,
-            //                ValidIssuer = configuration["Jwt:Issuer"],
-            //                ValidAudience = configuration["Jwt:Audience"],
-            //                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:key"]))
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                    .AddJwtBearer(c =>
+                    {
+                        c.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateIssuer = true,
+                            ValidateAudience = true,
+                            ValidateLifetime = true,
+                            ValidateIssuerSigningKey = true,
+                            ValidIssuer = configuration["Jwt:Issuer"],
+                            ValidAudience = configuration["Jwt:Audience"],
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:key"]))
 
-            //            };
-            //        });
+                        };
+                    });
 
             services.AddCors(c => {
                 c.AddPolicy("CorsPolicy",
-                    builder => builder.AllowAnyOrigin()
+                    builder => builder.WithOrigins("https://localhost:7062")
                                       .AllowAnyMethod()
                                       .AllowAnyHeader()
                                       .AllowCredentials().Build()
@@ -47,6 +50,7 @@ namespace AirlineManagementService.Configuration
             });
             services.AddApplicationDependency();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            services.AddConsulConfig(configuration);
             return services;
         }
         
@@ -60,6 +64,45 @@ namespace AirlineManagementService.Configuration
             services.AddScoped<IAirlineRepository, AirlineRepository>();
 
             return services;
+        }
+        public static IServiceCollection AddConsulConfig(this IServiceCollection service, IConfiguration configuration)
+        {
+            var consulAddress = configuration["ConsulUrl"];
+            service.AddSingleton<IConsulClient, ConsulClient>(c => new ConsulClient(con => {
+                con.Address = new Uri(consulAddress);
+            }));
+            return service;
+
+        }
+
+        public static IApplicationBuilder UseConsul(this IApplicationBuilder app, IHost host)
+        {
+            var consulClient = app.ApplicationServices.GetRequiredService<IConsulClient>();
+            var logger = app.ApplicationServices.GetRequiredService<ILoggerFactory>().CreateLogger("");
+            var lifetime = app.ApplicationServices.GetRequiredService<IHostApplicationLifetime>();
+
+            var features = host.Services.GetService<IServer>();
+            var addresses = features.Features.Get<IServerAddressesFeature>();
+            var address = addresses.Addresses.Last();
+
+            var url = new Uri(address);
+
+            var registration = new AgentServiceRegistration()
+            {
+                ID = "AirlineManagement-" + url.Port.ToString(),
+                Name = "AirlineManagement",
+                Address = $"{url.Host}",
+                Port = url.Port
+            };
+            logger.LogInformation("Registered with consul");
+            consulClient.Agent.ServiceDeregister(registration.ID).ConfigureAwait(true);
+            consulClient.Agent.ServiceRegister(registration).ConfigureAwait(true);
+            lifetime.ApplicationStopping.Register(() => {
+                logger.LogInformation("deregister");
+                consulClient.Agent.ServiceDeregister(registration.ID).ConfigureAwait(true);
+            });
+            return app;
+
         }
     }
 }

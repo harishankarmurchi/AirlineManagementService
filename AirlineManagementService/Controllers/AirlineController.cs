@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models.ViewModels;
 using Services.Abstraction;
@@ -18,6 +19,7 @@ namespace AirlineManagementService.Controllers
 
         [HttpPost]
         [Route("inventory/add")]
+        [Authorize(Roles ="Admin")]
 
         public Response<string> AddAirline([FromBody] AirlineVM airlineVM)
         {
@@ -46,7 +48,7 @@ namespace AirlineManagementService.Controllers
 
         [HttpPut]
         [Route("inventory/update")]
-
+        [Authorize(Roles = "Admin")]
         public Response<string> UpdateAirline([FromBody] AirlineVM airlineVM)
         {
             var response = new Response<string>();
@@ -74,7 +76,7 @@ namespace AirlineManagementService.Controllers
 
         [HttpPost]
         [Route("search")]
-
+        [Authorize]
         public Response<List<AirlineVM>> Search([FromBody] SearchVM searchVM)
         {
             var response = new Response<List<AirlineVM>>();
