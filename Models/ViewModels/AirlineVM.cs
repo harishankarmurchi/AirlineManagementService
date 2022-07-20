@@ -14,6 +14,7 @@ namespace Models.ViewModels
         public string Address { get; set; }
         public bool IsActive { get; set; }
         public string FlightNumber { get; set; }
+        public int FlightId { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public string InstrumentUsed { get; set; }

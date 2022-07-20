@@ -35,6 +35,7 @@ namespace AirlineManagementService.Configuration
                 .ForMember(dest => dest.FromPlaceName, opt => opt.MapFrom(src => src.FromPlace.PlaceName))
                 .ForMember(dest => dest.ToPlaceName, opt => opt.MapFrom(src => src.ToPlace.PlaceName))
                 .ForMember(dest => dest.MealTypeName, opt => opt.MapFrom(src => src.MealType.Type))
+                .ForMember(dest => dest.FlightId, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.Airline.IsActive));
 
 
