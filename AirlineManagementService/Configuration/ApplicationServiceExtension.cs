@@ -62,6 +62,8 @@ namespace AirlineManagementService.Configuration
             services.AddScoped<IMasterRepository, MasterRepository>();
             services.AddScoped<IAirlineService, AirlineService>();
             services.AddScoped<IAirlineRepository, AirlineRepository>();
+            services.AddScoped<IEventRepository, EventRepository>();
+            services.AddScoped<IEventService, EventService>();
 
             return services;
         }

@@ -1,4 +1,5 @@
 using AirlineManagementService.Configuration;
+using AirlineManagementService.MQListener;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -24,7 +25,7 @@ builder.Services.AddSwaggerGen(c =>
     c.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 builder.Services.AddRequiredServices(configuration);
-
+builder.Services.AddHostedService<AirlineListner>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
