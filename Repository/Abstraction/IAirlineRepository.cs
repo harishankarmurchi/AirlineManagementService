@@ -10,9 +10,11 @@ namespace Repository.Abstraction
 {
     public interface IAirlineRepository
     {
-        Flight AddFlight(Flight flight);
-        Airline AddAirline(Airline airline);
+        List<Flight> AddFlight(Flight flight);
+        List<Airline> AddAirline(Airline airline);
         Flight UpdateAirline(Flight flight);
         List<Flight> SearchFlight(SearchVM search);
+        Task<Airline> BlockAirline(Airline airline);
+        Task<Flight> ResheduleFlight(Flight flight);
     }
 }

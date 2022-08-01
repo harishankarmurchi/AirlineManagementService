@@ -44,7 +44,7 @@ namespace Repository.Repos
         {
             try
             {
-                return await _dbContext.Airlines.Where(x => x.IsActive == true).ToListAsync();
+                return await _dbContext.Airlines.ToListAsync();
 
             }catch(Exception ex)
             {

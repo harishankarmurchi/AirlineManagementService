@@ -23,19 +23,19 @@ namespace Services.Services
 
         }
 
-        public bool AddAirline(AirlineVM airlineVm)
+        public List<FlightVM> AddFlight(FlightVM airlineVm)
         {
             try
             {
-                var airline = _mapper.Map<Airline>(airlineVm);
-                airline =  _airRepo.AddAirline(airline);
+                //var airline = _mapper.Map<Airline>(airlineVm);
+                //airline =  _airRepo.AddAirline(airline);
                 var flight = _mapper.Map<Flight>(airlineVm);
-                flight.AirlineId = airline.Id;
-                flight.Seats = formFlightSeats(flight.NoOfRows, flight.NonBusinessClasssSeats, "B");
+                //flight.AirlineId = airline.Id;
+                flight.Seats = formFlightSeats(flight.NoOfRows, flight.BusinessClassSeats, "B");
                 flight.Seats.AddRange(formFlightSeats(flight.NoOfRows, flight.NonBusinessClasssSeats, "NB"));
                 var response =  _airRepo.AddFlight(flight);
-                if (response != null) return true;
-                return false;
+                if (response != null) return _mapper.Map<List<FlightVM>>(response);
+                return null;
                
 
             }
@@ -69,7 +69,7 @@ namespace Services.Services
             return seatsList;
         }
 
-        public bool UpdateFlight(AirlineVM airlineVM)
+        public bool UpdateFlight(FlightVM airlineVM)
         {
             try
             {
@@ -89,14 +89,65 @@ namespace Services.Services
             }
         }
 
-        public List<AirlineVM> Search(SearchVM search)
+        public List<FlightVM> Search(SearchVM search)
         {
             try
             {
                 var result = _airRepo.SearchFlight(search);
-                return _mapper.Map<List<AirlineVM>>(result);
+                return _mapper.Map<List<FlightVM>>(result);
 
             }catch(Exception ex)
+            {
+                throw;
+            }
+        }
+        public List<AirlineVM> AddAirline(AirlineVM airlineVm)
+        {
+            try
+            {
+                var airline = _mapper.Map<Airline>(airlineVm);
+                var result = _airRepo.AddAirline(airline);
+
+                if (result != null) return _mapper.Map<List<AirlineVM>>(result);
+                return null;
+
+
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<FlightVM> ResheduleFlight(ResheduleVM reshedule)
+        {
+            try
+            {
+                var flight = new Flight();
+                flight.Id = reshedule.FlightId;
+                flight.StartDate = reshedule.StartDate;
+                flight.EndDate = reshedule.EndDate;
+                var result= await _airRepo.ResheduleFlight(flight);
+                return  _mapper.Map<FlightVM>(result);
+
+            }catch(Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<AirlineVM> BlockAirline(AirlineVM airline)
+        {
+            try
+            {
+                var flight = new Airline();
+                flight.Id = airline.Id;
+                flight.IsActive = airline.IsActive;
+                var result = await _airRepo.BlockAirline(flight);
+                return _mapper.Map<AirlineVM>(result);
+
+            }
+            catch (Exception ex)
             {
                 throw;
             }

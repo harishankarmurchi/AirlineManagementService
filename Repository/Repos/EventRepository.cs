@@ -26,8 +26,8 @@ namespace Repository.Repos
                     _dbContext.Seats.Update(item);
                 }
                 
-                _dbContext.SaveChangesAsync();
-                _dbContext.Dispose();
+                _dbContext.SaveChanges();
+               // _dbContext.Dispose();
                 return true;
 
             }

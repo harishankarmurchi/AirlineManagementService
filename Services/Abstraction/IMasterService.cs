@@ -11,6 +11,6 @@ namespace Services.Abstraction
     public interface IMasterService
     {
         Task<MasterVM> GetMasterData();
-        Task<List<Airline>> GetAirline();
+        Task<List<AirlineVM>> GetAirline();
     }
 }

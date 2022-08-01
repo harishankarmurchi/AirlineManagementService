@@ -42,10 +42,10 @@ namespace AirlineManagementService.Configuration
 
             services.AddCors(c => {
                 c.AddPolicy("CorsPolicy",
-                    builder => builder.WithOrigins("https://localhost:7062")
+                    builder => builder.AllowAnyOrigin()
                                       .AllowAnyMethod()
                                       .AllowAnyHeader()
-                                      .AllowCredentials().Build()
+                                      .Build()
                 );
             });
             services.AddApplicationDependency();

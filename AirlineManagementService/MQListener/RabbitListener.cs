@@ -58,25 +58,27 @@ namespace AirlineManagementService.MQListener
         // Registered Consumer Monitor Here
         public void Register()
         {
-
-            channel.QueueDeclare(QueueName,
-               durable: true,
-               exclusive: false,
-               autoDelete: false,
-               arguments: null);
-            var consumer = new EventingBasicConsumer(channel);
-            
-            consumer.Received += (model, ea) =>
+            if (connection != null)
             {
-                var body = ea.Body;
-                var message = Encoding.UTF8.GetString(body.ToArray());
-                var result = Process(message);
-                if (result)
+                channel.QueueDeclare(QueueName,
+                   durable: true,
+                   exclusive: false,
+                   autoDelete: false,
+                   arguments: null);
+                var consumer = new EventingBasicConsumer(channel);
+
+                consumer.Received += (model, ea) =>
                 {
-                    channel.BasicAck(ea.DeliveryTag, false);
-                }
-            };
-            channel.BasicConsume(queue: QueueName, consumer: consumer);
+                    var body = ea.Body;
+                    var message = Encoding.UTF8.GetString(body.ToArray());
+                    var result = Process(message);
+                    if (result)
+                    {
+                        channel.BasicAck(ea.DeliveryTag, false);
+                    }
+                };
+                channel.BasicConsume(queue: QueueName, consumer: consumer);
+            }
         }
 
         public void DeRegister()
