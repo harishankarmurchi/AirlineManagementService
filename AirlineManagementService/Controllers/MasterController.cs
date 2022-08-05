@@ -21,7 +21,7 @@ namespace AirlineManagementService.Controllers
         }
 
         [HttpGet("masterdata")]
-        [Authorize]
+        //[Authorize]
         public async Task<Response<MasterVM>> GetMasterData()
         {
             var response = new Response<MasterVM>();
@@ -42,9 +42,9 @@ namespace AirlineManagementService.Controllers
         [HttpGet]
         [Route("airline")]
         [Authorize]
-        public async Task<Response<object>> GetAllAirlines()
+        public async Task<Response<List<AirlineVM>>> GetAllAirlines()
         {
-            var response = new Response<object>();
+            var response = new Response<List<AirlineVM>>();
             try
             {
                 response.StatusCode = (int)HttpStatusCode.OK;

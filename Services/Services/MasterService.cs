@@ -38,11 +38,12 @@ namespace Services.Services
             }
         }
 
-        public async Task<List<Airline>> GetAirline()
+        public async Task<List<AirlineVM>> GetAirline()
         {
             try
             {
-                return await _masterRepo.GetAirlines();
+                var result= await _masterRepo.GetAirlines();
+                return _mapper.Map<List<AirlineVM>>(result);
 
             }catch(Exception ex)
             {

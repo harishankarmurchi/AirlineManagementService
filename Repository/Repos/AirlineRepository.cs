@@ -18,7 +18,7 @@ namespace Repository.Repos
             _dbContext = dbContext;
         }
 
-        public Flight AddFlight(Flight flight)
+        public List<Flight> AddFlight(Flight flight)
         {
             try
             {
@@ -27,7 +27,11 @@ namespace Repository.Repos
                 {
                     _dbContext.Flights.Add(flight);
                      _dbContext.SaveChanges();
-                    return flight;
+                    return _dbContext.Flights.Include("Airline")
+                    .Include("MealType").Include("FromPlace").Include("ToPlace")
+                    .Include("Seats")
+                    .ToList();
+                    
                 }
                 throw new Exception("Flight with same No and Date already Exist");
             }catch(Exception ex)
@@ -36,7 +40,7 @@ namespace Repository.Repos
             }
         }
 
-        public Airline AddAirline(Airline airline)
+        public  List<Airline> AddAirline(Airline airline)
         {
             try
             {
@@ -45,11 +49,14 @@ namespace Repository.Repos
                 {
                     _dbContext.Airlines.Add(airline);
                     _dbContext.SaveChanges();
-                    return airline;
+                    
+                    
                 }
-                return result;
+                
+                return _dbContext.Airlines.ToList();
 
-            }catch(Exception ex)
+            }
+            catch(Exception ex)
             {
                 throw;
             }
@@ -104,5 +111,51 @@ namespace Repository.Repos
                 throw;
             }
         }
+
+        public async Task<Flight> ResheduleFlight(Flight flight)
+        {
+            try
+            {
+                var res=_dbContext.Flights.FirstOrDefault(x => x.Id == flight.Id);
+                if(res!= null)
+                {
+                    res.StartDate = flight.StartDate;
+                    res.EndDate = flight.EndDate;
+                    _dbContext.Flights.Update(res);
+                    _dbContext.SaveChanges();
+                }
+                return await _dbContext.Flights.Include("Airline")
+                     .Include("MealType").Include("FromPlace").Include("ToPlace")
+                     .Include("Seats").FirstOrDefaultAsync(x => x.Id == flight.Id);
+
+            }
+            catch(Exception ex)
+
+            {
+                throw;
+            }
+        }
+        public async Task<Airline> BlockAirline(Airline airline)
+        {
+            try
+            {
+                var res = _dbContext.Airlines.FirstOrDefault(x => x.Id == airline.Id);
+                if (res != null)
+                {
+                    res.IsActive = airline.IsActive;
+                    _dbContext.Airlines.Update(res);
+                    _dbContext.SaveChanges();
+                }
+                return await _dbContext.Airlines.FirstOrDefaultAsync(x => x.Id == airline.Id);
+
+            }
+            catch (Exception ex)
+
+            {
+                throw;
+            }
+        }
+
+
     }
 }

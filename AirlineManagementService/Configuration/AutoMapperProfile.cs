@@ -17,25 +17,24 @@ namespace AirlineManagementService.Configuration
                 .ForMember(dest => dest.MealType, opt => opt.MapFrom(src => src.Type))
                 .ReverseMap();
 
-            CreateMap<AirlineVM, Airline>()
-                  .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.AirlineName));
+           
 
             CreateMap<SeatVM, FlightSeats>().ReverseMap();
+            CreateMap<AirlineVM, Airline>().ReverseMap();
 
-
-            CreateMap<AirlineVM, Flight>()
+            CreateMap<FlightVM, Flight>()
                 .ForMember(dest => dest.ShedhuleDays, opt => opt.MapFrom(src => String.Join(",", src.ShedhuleDays)));
 
-            CreateMap<Flight, AirlineVM>()
-                .ForMember(dest => dest.AirlineName, opt => opt.MapFrom(src => src.Airline.Name))
-                .ForMember(dest => dest.Logo, opt => opt.MapFrom(src => src.Airline.Logo))
+            CreateMap<Flight, FlightVM>()
+
                 .ForMember(dest => dest.ShedhuleDays, opt => opt.MapFrom(src => MapSheduleDays(src.ShedhuleDays)))
-                .ForMember(dest => dest.ContactNo, opt => opt.MapFrom(src => src.Airline.ContactNo))
-                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Airline.Address))
+
                 .ForMember(dest => dest.FromPlaceName, opt => opt.MapFrom(src => src.FromPlace.PlaceName))
                 .ForMember(dest => dest.ToPlaceName, opt => opt.MapFrom(src => src.ToPlace.PlaceName))
                 .ForMember(dest => dest.MealTypeName, opt => opt.MapFrom(src => src.MealType.Type))
-                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.Airline.IsActive));
+                .ForMember(dest => dest.NonBusinessClassSeats, opt => opt.MapFrom(src => src.NonBusinessClasssSeats))
+                .ForMember(dest => dest.FlightId, opt => opt.MapFrom(src => src.Id));
+               
 
 
 

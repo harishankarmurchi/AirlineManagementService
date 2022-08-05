@@ -9,9 +9,12 @@ namespace Services.Abstraction
 {
     public interface IAirlineService
     {
-        bool AddAirline(AirlineVM airlineVm);
-        bool UpdateFlight(AirlineVM airlineVM);
-        List<AirlineVM> Search(SearchVM search);
+        List<FlightVM> AddFlight(FlightVM airlineVm);
+        bool UpdateFlight(FlightVM airlineVM);
+        List<FlightVM> Search(SearchVM search);
+        List<AirlineVM> AddAirline(AirlineVM airlineVm);
+        Task<AirlineVM> BlockAirline(AirlineVM airline);
+        Task<FlightVM> ResheduleFlight(ResheduleVM reshedule);
 
 
 

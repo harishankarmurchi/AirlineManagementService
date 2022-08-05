@@ -21,21 +21,17 @@ namespace AirlineManagementService.Controllers
         [Route("inventory/add")]
         [Authorize(Roles ="Admin")]
 
-        public Response<string> AddAirline([FromBody] AirlineVM airlineVM)
+        public Response<List<FlightVM>> AddFlight([FromBody] FlightVM airlineVM)
         {
-            var response = new Response<string>();
+            var response = new Response<List<FlightVM>>();
             try
             {
-                if (_airService.AddAirline(airlineVM))
-                {
+               
                     response.StatusCode = (int)HttpStatusCode.OK;
                     response.Message = "Airline added";
-                }
-                else
-                {
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
-                    response.Message = "Airline Not added";
-                }
+                    response.Data = _airService.AddFlight(airlineVM);
+
+
 
             }
             catch(Exception ex)
@@ -49,7 +45,7 @@ namespace AirlineManagementService.Controllers
         [HttpPut]
         [Route("inventory/update")]
         [Authorize(Roles = "Admin")]
-        public Response<string> UpdateAirline([FromBody] AirlineVM airlineVM)
+        public Response<string> UpdateAirline([FromBody] FlightVM airlineVM)
         {
             var response = new Response<string>();
             try
@@ -77,9 +73,9 @@ namespace AirlineManagementService.Controllers
         [HttpPost]
         [Route("search")]
         [Authorize]
-        public Response<List<AirlineVM>> Search([FromBody] SearchVM searchVM)
+        public Response<List<FlightVM>> Search([FromBody] SearchVM searchVM)
         {
-            var response = new Response<List<AirlineVM>>();
+            var response = new Response<List<FlightVM>>();
             try
             {
                 response.StatusCode = (int)HttpStatusCode.OK;
@@ -87,6 +83,64 @@ namespace AirlineManagementService.Controllers
 
             }
             catch(Exception ex)
+            {
+                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+        [HttpPost("addairline")]
+
+        public Response<List<AirlineVM>> AddAirline([FromBody]AirlineVM airline)
+        {
+            var response = new Response<List<AirlineVM>>();
+            try
+            {
+                response.StatusCode = (int)HttpStatusCode.OK;
+                response.Data = _airService.AddAirline(airline);
+
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+        [HttpPost("reshedule")]
+        [Authorize]
+
+        public async Task<Response<FlightVM>> ResheduleFlight([FromBody]ResheduleVM reshedule)
+        {
+            var response = new Response<FlightVM>();
+            try
+            {
+                response.StatusCode = (int)HttpStatusCode.OK;
+                response.Data = await _airService.ResheduleFlight(reshedule);
+
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+        [HttpPost("block")]
+        [Authorize]
+
+        public async Task<Response<AirlineVM>> Block([FromBody] AirlineVM airline)
+        {
+            var response = new Response<AirlineVM>();
+            try
+            {
+                response.StatusCode = (int)HttpStatusCode.OK;
+                response.Data = await _airService.BlockAirline(airline);
+
+            }
+            catch (Exception ex)
             {
                 response.StatusCode = (int)HttpStatusCode.BadRequest;
                 response.Message = ex.Message;
